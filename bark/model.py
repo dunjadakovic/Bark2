@@ -130,6 +130,7 @@ class Block(nn.Module):
         self.attn = CausalSelfAttention(config)
         self.ln_2 = LayerNorm(config.n_embd, bias=config.bias)
         self.mlp = MLP(config)
+        self.extralayer = Extralayer(config)
         self.layer_idx = layer_idx
 
     def forward(self, x, past_kv=None, use_cache=False):
