@@ -14,7 +14,7 @@ import tqdm
 from transformers import BertTokenizer
 from huggingface_hub import hf_hub_download
 
-from .model import GPTConfig, GPT
+from .model import GPTConfig, GPT, Extralayer
 from .model_fine import FineGPT, FineGPTConfig
 
 if (
