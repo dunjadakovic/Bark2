@@ -112,7 +112,7 @@ class Extralayer(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.processing  = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
-        self.processingg  = nn.Linear(2 * config.n_embd, config.n_embd, bias=config.bias)
+        self.processingg  = nn.Linear(3 * config.n_embd, config.n_embd, bias=config.bias)
         self.dropout = nn.Dropout(config.dropout / 2)
 
     def forward(self, x):
