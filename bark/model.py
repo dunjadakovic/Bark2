@@ -107,6 +107,21 @@ class MLP(nn.Module):
         x = self.dropout(x)
         return x
 
+class Extralayer(nn.Module):
+
+    def __init__(self, config):
+        super().__init__()
+        self.processing  = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
+        self.processingg  = nn.Linear(4 * config.n_embd, config.n_embd, bias=config.bias)
+        self.dropout = nn.Dropout(config.dropout)
+
+    def forward(self, x):
+        x = self.processing(x)
+        x = self.processingg(x)
+        x = self.dropout(x)
+        return x
+
+
 class Block(nn.Module):
 
     def __init__(self, config, layer_idx):
@@ -214,5 +229,3 @@ class GPT(nn.Module):
 
         # inference-time mini-optimization: only forward the lm_head on the very last position
         logits = self.lm_head(x[:, [-1], :]) # note: using list [-1] to preserve the time dim
-
-        return (logits, new_kv)
