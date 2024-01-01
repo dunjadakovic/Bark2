@@ -129,6 +129,7 @@ class Block(nn.Module):
         self.ln_1 = LayerNorm(config.n_embd, bias=config.bias)
         self.attn = CausalSelfAttention(config)
         self.ln_2 = LayerNorm(config.n_embd, bias=config.bias)
+        self.ln_3 = LayerNorm(config.n_embd, bias=config.bias)
         self.mlp = MLP(config)
         self.extralayer = Extralayer(config)
         self.layer_idx = layer_idx
@@ -137,6 +138,7 @@ class Block(nn.Module):
         attn_output, prev_kvs = self.attn(self.ln_1(x), past_kv=past_kv, use_cache=use_cache)
         x = x + attn_output
         x = x + self.mlp(self.ln_2(x))
+        x = x + self.extralayer(self.ln_3(x))
         return (x, prev_kvs)
 
 @dataclass
