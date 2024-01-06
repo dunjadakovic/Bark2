@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-from .model import GPT, GPTConfig, MLP
+from .model import GPT, GPTConfig, MLP, Extralayer
 
 
 class NonCausalSelfAttention(nn.Module):
@@ -67,11 +67,14 @@ class FineBlock(nn.Module):
         self.ln_1 = nn.LayerNorm(config.n_embd)
         self.attn = NonCausalSelfAttention(config)
         self.ln_2 = nn.LayerNorm(config.n_embd)
+        self.ln_3 = nn.LayerNorm(config.n_embd)
         self.mlp = MLP(config)
+        self.extralayer = Extralayer(config)
 
     def forward(self, x):
         x = x + self.attn(self.ln_1(x))
         x = x + self.mlp(self.ln_2(x))
+        x = x + self.extralayer(self.ln_3(x))
         return x
 
 
