@@ -7,7 +7,7 @@ from encodec import EncodecModel
 import funcy
 import logging
 import numpy as np
-from scipy.special import softmax
+import tensorflow as tf
 import torch
 import torch.nn.functional as F
 import tqdm
@@ -469,7 +469,7 @@ def generate_text_semantic(
                 relevant_logits = relevant_logits.detach().cpu().type(torch.float32).numpy()
                 sorted_indices = np.argsort(relevant_logits)[::-1]
                 sorted_logits = relevant_logits[sorted_indices]
-                cumulative_probs = np.cumsum(softmax(sorted_logits))
+                cumulative_probs = np.cumsum(tf.keras.activations.relu(sorted_logits))
                 sorted_indices_to_remove = cumulative_probs > top_p
                 sorted_indices_to_remove[1:] = sorted_indices_to_remove[:-1].copy()
                 sorted_indices_to_remove[0] = False
@@ -479,7 +479,7 @@ def generate_text_semantic(
             if top_k is not None:
                 v, _ = torch.topk(relevant_logits, min(top_k, relevant_logits.size(-1)))
                 relevant_logits[relevant_logits < v[-1]] = -float("Inf")
-            probs = F.softmax(relevant_logits / temp, dim=-1)
+            probs = F.tf.keras.activations.relu(relevant_logits / temp, dim=-1)
             item_next = torch.multinomial(probs, num_samples=1).to(torch.int32)
             if allow_early_stop and (
                 item_next == SEMANTIC_VOCAB_SIZE
@@ -657,7 +657,7 @@ def generate_coarse(
                     relevant_logits = relevant_logits.detach().cpu().type(torch.float32).numpy()
                     sorted_indices = np.argsort(relevant_logits)[::-1]
                     sorted_logits = relevant_logits[sorted_indices]
-                    cumulative_probs = np.cumsum(softmax(sorted_logits))
+                    cumulative_probs = np.cumsum(tf.keras.activations.relu(sorted_logits))
                     sorted_indices_to_remove = cumulative_probs > top_p
                     sorted_indices_to_remove[1:] = sorted_indices_to_remove[:-1].copy()
                     sorted_indices_to_remove[0] = False
@@ -667,7 +667,7 @@ def generate_coarse(
                 if top_k is not None:
                     v, _ = torch.topk(relevant_logits, min(top_k, relevant_logits.size(-1)))
                     relevant_logits[relevant_logits < v[-1]] = -float("Inf")
-                probs = F.softmax(relevant_logits / temp, dim=-1)
+                probs = F.tf.keras.activations.relu(relevant_logits / temp, dim=-1)
                 item_next = torch.multinomial(probs, num_samples=1).to(torch.int32)
                 item_next += logit_start_idx
                 x_coarse_in = torch.cat((x_coarse_in, item_next[None]), dim=1)
@@ -772,7 +772,7 @@ def generate_fine(
                     codebook_preds = torch.argmax(relevant_logits, -1)
                 else:
                     relevant_logits = logits[0, :, :CODEBOOK_SIZE] / temp
-                    probs = F.softmax(relevant_logits, dim=-1)
+                    probs = F.tf.keras.activations.relu(relevant_logits, dim=-1)
                     codebook_preds = torch.multinomial(
                         probs[rel_start_fill_idx:1024], num_samples=1
                     ).reshape(-1)
