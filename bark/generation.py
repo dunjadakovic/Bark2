@@ -535,7 +535,7 @@ def generate_coarse(
     top_k=None,
     top_p=None,
     silent=False,
-    max_coarse_history=60,  # min 60 (faster), max 630 (more context)
+    max_coarse_history=90,  # min 60 (faster), max 630 (more context)
     sliding_window_len=60,
     use_kv_caching=False,
 ):
