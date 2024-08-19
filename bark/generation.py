@@ -89,7 +89,7 @@ def _cast_bool_env_var(s):
     return s.lower() in ('true', '1', 't')
 
 
-USE_SMALL_MODELS = _cast_bool_env_var(os.environ.get("SUNO_USE_SMALL_MODELS", "True"))
+USE_SMALL_MODELS = _cast_bool_env_var(os.environ.get("SUNO_USE_SMALL_MODELS", "False"))
 GLOBAL_ENABLE_MPS = _cast_bool_env_var(os.environ.get("SUNO_ENABLE_MPS", "False"))
 OFFLOAD_CPU = _cast_bool_env_var(os.environ.get("SUNO_OFFLOAD_CPU", "False"))
 
@@ -301,12 +301,12 @@ def load_codec_model(use_gpu=True, force_reload=False):
 
 
 def preload_models(
-    text_use_gpu=False,
-    text_use_small=True,
-    coarse_use_gpu=False,
-    coarse_use_small=True,
-    fine_use_gpu=False,
-    fine_use_small=True,
+    text_use_gpu=True,
+    text_use_small=False,
+    coarse_use_gpu=True,
+    coarse_use_small=False,
+    fine_use_gpu=True,
+    fine_use_small=False,
     codec_use_gpu=False,
     force_reload=False,
 ):
@@ -377,7 +377,7 @@ def _load_history_prompt(history_prompt_input):
 def generate_text_semantic(
     text,
     history_prompt=None,
-    temp=0.65,
+    temp=0.7,
     top_k=None,
     top_p=None,
     silent=False,
@@ -531,11 +531,11 @@ COARSE_INFER_TOKEN = 12_050
 def generate_coarse(
     x_semantic,
     history_prompt=None,
-    temp=0.65,
+    temp=0.7,
     top_k=None,
     top_p=None,
     silent=False,
-    max_coarse_history=90,  # min 60 (faster), max 630 (more context)
+    max_coarse_history=60,  # min 60 (faster), max 630 (more context)
     sliding_window_len=60,
     use_kv_caching=False,
 ):
