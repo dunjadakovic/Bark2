@@ -109,7 +109,7 @@ class MLP(nn.Module):
         x = self.dropout(x)
         return x
 #adding normalisation layer
-class Normlayer(nn.Module): 
+class Extralayer(nn.Module): 
 
     def __init__(self, config):
         super().__init__()
